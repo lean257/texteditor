@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import fire from './firebase'
-import TextField from 'material-ui/TextField';
+import { Form, TextArea } from 'semantic-ui-react'
 
 const db = fire.database()
 
@@ -17,7 +17,7 @@ class App extends Component {
     })
     console.log('value', e.target.value)
     db.ref(`/room`).set({
-      value: this.state.value
+      value: e.target.value
     })
   }
   componentWillMount() {
@@ -33,13 +33,9 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Real time editor</h2>
         </div>
-          <TextField 
-            id="text-field-controlled"
-            value={this.state.value || ''}
-            onChange={this.handleChange}
-            multiLine={true}
-            rowsMax = {100}
-          />
+          <Form>
+            <TextArea placeholder='Tell us more' style={{ minHeight: 100 }} />
+          </Form>
       </div>
     );
   }
