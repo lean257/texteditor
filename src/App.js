@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
-import fire from './firebase'
-import { Form, TextArea } from 'semantic-ui-react'
-
+import Menu from './Menu'
+import fire from './firebase';
+import {Controlled as CodeMirror} from 'react-codemirror2'
+import 'codemirror/lib/codemirror.css';  
+import 'codemirror/theme/monokai.css';  
+import 'codemirror/mode/javascript/javascript.js';
 const db = fire.database()
 
 class App extends Component {
@@ -11,31 +13,39 @@ class App extends Component {
     super()
     this.state = {value: ''}
   }
-  handleChange = (e) => {
+  handleChange = (newValue) => {
     this.setState({
-      value: e.target.value
+      value: newValue
     })
-    console.log('value', e.target.value)
     db.ref(`/room`).set({
-      value: e.target.value
+      value: this.state.value
     })
   }
-  componentWillMount() {
+  componentDidMount() {
     db.ref(`/room/value`).on('value', snapshot => {
       const value = snapshot.val()
       this.setState({value})
     })
   }
   render() {
+    const options = {
+      lineNumbers: true,
+      mode: 'javascript',
+      theme: 'monokai',
+    }
     return (
       <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Real time editor</h2>
-        </div>
-          <Form>
-            <TextArea placeholder='Tell us more' style={{ minHeight: 100 }} />
-          </Form>
+        <header><Menu /></header>
+        <CodeMirror
+          value={this.state.value} 
+          options={options}
+          onBeforeChange={(editor, data, value) => {
+            this.setState({value});
+          }}
+          onChange={(editor, data, value) => {
+            this.handleChange(value)
+          }}
+         />
       </div>
     );
   }
