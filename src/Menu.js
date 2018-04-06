@@ -11,14 +11,19 @@ export default class NavBar extends Component {
     }
   }
   
-  changeLanguage = (event, data) => {
+  handleChangeLanguage = (event, data) => {
     this.setState({
       language: data.value,
     })
-    // using this.state.language below caused race condition?
-    db.ref(`/room`).update({
+    db.ref(`/rooms/${this.props.room}`).update({
       language: data.value
     })
+  }
+
+  handleRun = () => {
+    // set run state to true
+
+    // call firebase functions 
   }
 
   render() {
@@ -32,7 +37,7 @@ export default class NavBar extends Component {
     return (
       <Menu inverted>
         <Button color='green'>Run</Button>
-        <Dropdown placeholder='Javascript' search selection options={languageOptions} onChange={this.changeLanguage}/>
+        <Dropdown placeholder='Javascript' search selection options={languageOptions} onChange={this.handleChangeLanguage}/>
       </Menu>
     )
   }

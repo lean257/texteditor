@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import './App.css';
+import {Controlled as CodeMirror} from 'react-codemirror2'
 import Menu from './Menu'
 import fire from './firebase';
-import {Controlled as CodeMirror} from 'react-codemirror2'
 import 'codemirror/lib/codemirror.css';  
 import 'codemirror/theme/monokai.css';  
-import 'codemirror/mode/javascript/javascript.js';
+import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/python/python';
 import 'codemirror/mode/ruby/ruby';
 import 'codemirror/mode/clike/clike';
@@ -21,26 +20,27 @@ class App extends Component {
     }
   }
   
+  componentDidMount() {
+    const room = this.props.match.params.roomName
+    db.ref(`/rooms/${room}/value`).on('value', snapshot => {
+      const value = snapshot.val()
+      this.setState({value})
+    })
+    db.ref(`/rooms/${room}/language`).on('value', snapshot => {
+      const language = snapshot.val()
+      this.setState({language})
+    })
+  }
+
   handleChange = (newValue) => {
     this.setState({
       value: newValue
     })
-    db.ref(`/room`).update({
+    db.ref(`/rooms/${this.props.match.params.roomName}`).update({
       value: this.state.value,
     })
   }
-  
-  componentDidMount() {
-    db.ref(`/room/value`).on('value', snapshot => {
-      const value = snapshot.val()
-      this.setState({value})
-    })
-    db.ref(`/room/language`).on('value', snapshot => {
-      const language = snapshot.val()
-      console.log('language in App componentDidmount', language)
-      this.setState({language})
-    })
-  }
+
   render() {
     const options = {
       lineNumbers: true,
@@ -50,7 +50,7 @@ class App extends Component {
     return (
       <div className="App">
         <header>
-          <Menu />
+          <Menu room={this.props.match.params.roomName}/>
         </header>
         <CodeMirror
           value={this.state.value} 
@@ -66,4 +66,4 @@ class App extends Component {
     );
   }
 }
-export default App;
+export default App
